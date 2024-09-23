@@ -1,0 +1,92 @@
+[tool.poetry]
+name = "pycalc"
+version = "0.1.0"
+description = ""
+authors = ["Roberto D. Cazarin <robertodmngzczrn@gmail.com>"]
+readme = "README.md"
+license = "MIT"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.13"
+PySide6 = "^6.7.2"
+sympy = "^1.13.2"
+pyinstaller = "^6.10.0"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.6.5"
+poethepoet = "^0.28.0"
+pytest = "^8.3.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.poe.tasks]
+updateview = "pyside6-uic -o ./src/main/ui/gen/ui_calculadora_view.py ./assets/ui_calculadora_view.ui"
+updatercc = "pyside6-rcc -o ./src/main/icons_rc.py ./assets/icons.qrc"
+updateall = ["updateview", "updatercc"]
+format = "ruff format"
+check = "ruff check"
+runtest = "pytest ./src/test"
+runapp = "python ./src/main/main.py"
+build = "pyinstaller --clean --noconsole --name=PyCalc6 ./src/main/main.py "
+add_assets = "python utilassets.py"
+build_all = ["build", "add_assets"]
+run_and_update = ["updateall", "runapp"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src/main"]
+
+[tool.ruff]
+exclude = [
+    ".idea",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".vscode",
+    "assets",
+    "src/main/ui/gen/ui_*.py",
+    "src/main/icons_rc.py"
+]
+
+# Same as Black.
+line-length = 88
+indent-width = 4
+
+# Assume Python 3.9
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F"]
+ignore = ["F401"]
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+# Enable auto-formatting of code examples in docstrings. Markdown,
+# reStructuredText code/literal blocks and doctests are all supported.
+#
+# This is currently disabled by default, but it is planned for this
+# to be opt-out in the future.
+docstring-code-format = false
+
+# Set the line length limit used when formatting code snippets in
+# docstrings.
+#
+# This only has an effect when the `docstring-code-format` setting is
+# enabled.
+docstring-code-line-length = "dynamic"

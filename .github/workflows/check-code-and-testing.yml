@@ -1,0 +1,65 @@
+# Workflow para validar código y realizar pruebas en cada Pull Request a la rama main
+
+name: Check Code and Testing PyCalc6
+
+on:
+  pull_request:
+    branches: ['main']
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: windows-latest
+
+    steps:
+      # 1. Clonar el repositorio
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      # 2. Configurar Python 3.11
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # 3. Instalar Poetry
+      - name: Install Poetry
+        run: |
+          (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
+
+      # 3.5. Agregar el directorio de Poetry al PATH
+      - name: Add Poetry to PATH
+        run: |
+           echo "C:\\Users\\runneradmin\\AppData\\Roaming\\Python\\Scripts" >> $env:GITHUB_PATH
+
+      # 4. Deshabilitar entornos virtuales de Poetry
+      - name: Disable Poetry virtual environments
+        run: |
+          poetry config virtualenvs.create false
+
+      # 5. Instalar dependencias usando Poetry
+      - name: Install dependencies using Poetry
+        run: |
+          poetry install
+
+      # 6. Mostrar información del entorno de Poetry
+      - name: Show Poetry information
+        run: |
+          poetry env info
+
+      # 7. Linting con ruff
+      - name: Lint with ruff
+        run: |
+          poe check || exit 1
+      
+      # 8. Generar archivos de UI
+      - name: Generate UI files
+        run: |
+          poe updateall
+
+      # 10. Correr pruebas con pytest
+      - name: Test with pytest
+        run: |
+          poe runtest || exit 1

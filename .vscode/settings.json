@@ -1,0 +1,14 @@
+{
+    "python.analysis.extraPaths": [
+        "./src/main"
+    ],
+    "emeraldwalk.runonsave": {
+        
+        "commands": [
+            {
+                "match": "src\\\\.*",
+                "cmd": "echo 'Change on ${file}' && conda activate calculadora-env2 && poe format"
+            }
+        ]
+    }
+}
